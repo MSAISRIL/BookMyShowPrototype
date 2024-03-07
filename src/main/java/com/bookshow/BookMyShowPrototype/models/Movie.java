@@ -20,10 +20,10 @@ public class Movie {
     @Column(unique = true)
     private String movieName;
     @NotEmpty(message = "Movie Director is Required")
-    @Column(unique = true)
+
     private String movieDirector;
     @NotEmpty(message = "Movie Length is Required")
-    @Column(unique = true)
+
     private String movieLength;
     @NotEmpty(message = " Male lead role Details is Required")
     private String leadRoleMale;
