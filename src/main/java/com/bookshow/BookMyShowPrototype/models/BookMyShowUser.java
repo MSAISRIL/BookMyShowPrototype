@@ -32,7 +32,7 @@ public class BookMyShowUser {
     @Column(columnDefinition = "BOOLEAN default false")
     private Boolean isAdmin;
     @NotEmpty(message = "Password is Required")
-    @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}$\n", message = "Password should be atleast 6 character and should contain atleast one UpperCase, Lower Case Character and a Number")
+    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@#$%^&+=]).{8,}$", message = "Password should be atleast 6 character and should contain atleast one UpperCase, Lower Case Character and a Number")
     @Size(min = 6)
     private String password;
 

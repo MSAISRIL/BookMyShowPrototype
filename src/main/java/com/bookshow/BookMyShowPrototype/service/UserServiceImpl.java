@@ -31,7 +31,8 @@ public class UserServiceImpl implements IUserService{
     private final MovieRepository movieRepository;
 
     @Autowired
-    UserServiceImpl(UserRepository userRepository, ErrorLogDto errorLogDto, LoginRepository loginRepository, MovieRepository movieRepository){
+    UserServiceImpl(UserRepository userRepository, ErrorLogDto errorLogDto,
+                    LoginRepository loginRepository, MovieRepository movieRepository){
         this.userRepository=userRepository;
         this.errorLogDto=errorLogDto;
         this.loginRepository = loginRepository;
@@ -39,6 +40,7 @@ public class UserServiceImpl implements IUserService{
     }
     @Override
     public ResponseEntity<?> addUser(BookMyShowUser user) {
+        user.setIsAdmin(false);
         try {
            return new ResponseEntity<>(userRepository.save(user), HttpStatus.OK);
         } catch (DataIntegrityViolationException ex) {
@@ -82,12 +84,13 @@ public class UserServiceImpl implements IUserService{
             if(user.get().getPassword().equals(userLogin.getPassword())){
                 Optional<LoginStatus> status = loginRepository.findById(userLogin.getEmailId());
                 if(!status.isPresent()) {
-                    return new ResponseEntity<>("Login Successful\n"+loginRepository.save(new LoginStatus(userLogin.getEmailId(), tokenGenerator())), HttpStatus.OK);
+                    return new ResponseEntity<>("Login Successful\n"+
+                            loginRepository.save(new LoginStatus(userLogin.getEmailId(), tokenGenerator())), HttpStatus.OK);
                 }
                 return new ResponseEntity<>("Login Successful\n"+status.get(),HttpStatus.OK);
             }
         }
-        return new ResponseEntity<>("Login Failed Invalid User Email / Password", HttpStatus.OK);
+        return new ResponseEntity<>("Login Failed Invalid User Email / Password", HttpStatus.UNAUTHORIZED);
     }
 
     @Override
@@ -100,7 +103,8 @@ public class UserServiceImpl implements IUserService{
     @Override
     public ResponseEntity<?> addMovie(Movie movie) {
         if(movieRepository.findByMovieName(movie.getMovieName()).isPresent())
-            return new ResponseEntity<>("Movie with Name "+movie.getMovieName()+" already exist. ", HttpStatus.EXPECTATION_FAILED);
+            return new ResponseEntity<>("Movie with Name "
+                    +movie.getMovieName()+" already exist. ", HttpStatus.EXPECTATION_FAILED);
         return new ResponseEntity<>(movieRepository.save(movie), HttpStatus.CREATED);
     }
 
@@ -109,6 +113,23 @@ public class UserServiceImpl implements IUserService{
         return new ResponseEntity<>(loginRepository
                 .deleteByloginToken(loginToken)>0?"User logged out successfully":"No Active session to logout",
                 HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<?> deleteMovie(Long movieId) {
+        return new ResponseEntity<>(movieRepository
+                .deleteBymovieId(movieId)>0?"Movie deleted successfully":"No Movie with ID: "+movieId+" to delete",
+                HttpStatus.OK);
+    }
+
+    @Override
+    public boolean isAdmin(UserLogin userLogin) {
+        Optional<BookMyShowUser> user =userRepository.findByEmailId(userLogin.getEmailId());
+        if(user.isPresent()){
+            if(user.get().getIsAdmin())
+                return true;
+        }
+        return false;
     }
 
     private String tokenGenerator(){

@@ -18,4 +18,8 @@ public interface IUserService {
     ResponseEntity<?> addMovie(Movie movie);
 
     ResponseEntity<?> logOut(String loginToken);
+
+    ResponseEntity<?> deleteMovie(Long movieId);
+
+    boolean isAdmin(UserLogin userLogin);
 }
