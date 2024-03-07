@@ -3,8 +3,10 @@ package com.bookshow.BookMyShowPrototype.service;
 import com.bookshow.BookMyShowPrototype.dto.ErrorLogDto;
 import com.bookshow.BookMyShowPrototype.models.BookMyShowUser;
 import com.bookshow.BookMyShowPrototype.models.LoginStatus;
+import com.bookshow.BookMyShowPrototype.models.Movie;
 import com.bookshow.BookMyShowPrototype.models.UserLogin;
 import com.bookshow.BookMyShowPrototype.repository.LoginRepository;
+import com.bookshow.BookMyShowPrototype.repository.MovieRepository;
 import com.bookshow.BookMyShowPrototype.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -14,7 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.TransactionSystemException;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
-import java.nio.charset.Charset;
 import java.sql.SQLException;
 import java.util.Optional;
 import java.util.Random;
@@ -27,11 +28,14 @@ public class UserServiceImpl implements IUserService{
 
     private final LoginRepository loginRepository;
 
+    private final MovieRepository movieRepository;
+
     @Autowired
-    UserServiceImpl(UserRepository userRepository, ErrorLogDto errorLogDto, LoginRepository loginRepository){
+    UserServiceImpl(UserRepository userRepository, ErrorLogDto errorLogDto, LoginRepository loginRepository, MovieRepository movieRepository){
         this.userRepository=userRepository;
         this.errorLogDto=errorLogDto;
         this.loginRepository = loginRepository;
+        this.movieRepository = movieRepository;
     }
     @Override
     public ResponseEntity<?> addUser(BookMyShowUser user) {
@@ -84,6 +88,27 @@ public class UserServiceImpl implements IUserService{
             }
         }
         return new ResponseEntity<>("Login Failed Invalid User Email / Password", HttpStatus.OK);
+    }
+
+    @Override
+    public boolean verifyToken(String loginToken) {
+        if(loginRepository.findByloginToken(loginToken).isPresent())
+            return true;
+        return false;
+    }
+
+    @Override
+    public ResponseEntity<?> addMovie(Movie movie) {
+        if(movieRepository.findByMovieName(movie.getMovieName()).isPresent())
+            return new ResponseEntity<>("Movie with Name "+movie.getMovieName()+" already exist. ", HttpStatus.EXPECTATION_FAILED);
+        return new ResponseEntity<>(movieRepository.save(movie), HttpStatus.CREATED);
+    }
+
+    @Override
+    public ResponseEntity<?> logOut(String loginToken) {
+        return new ResponseEntity<>(loginRepository
+                .deleteByloginToken(loginToken)>0?"User logged out successfully":"No Active session to logout",
+                HttpStatus.OK);
     }
 
     private String tokenGenerator(){

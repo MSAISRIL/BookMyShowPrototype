@@ -30,9 +30,9 @@ public class BookMyShowUser {
     @NotEmpty(message = "Last Name is Required")
     private String lastName;
     @Column(columnDefinition = "BOOLEAN default false")
-    private boolean isAdmin;
+    private Boolean isAdmin;
     @NotEmpty(message = "Password is Required")
-    @Pattern(regexp = "^([A-Z]+[a-z]+[0-9]+)$", message = "Password should be atleast 6 character and should contain atleast one UpperCase, Lower Case Character and a Number")
+    @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}$\n", message = "Password should be atleast 6 character and should contain atleast one UpperCase, Lower Case Character and a Number")
     @Size(min = 6)
     private String password;
 
