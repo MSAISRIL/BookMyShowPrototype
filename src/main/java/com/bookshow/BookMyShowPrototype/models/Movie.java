@@ -13,6 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 @Entity(name = "movie_details")
 public class Movie {
+
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long movieId;

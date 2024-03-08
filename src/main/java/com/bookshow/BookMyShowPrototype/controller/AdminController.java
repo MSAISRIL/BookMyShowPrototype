@@ -41,6 +41,4 @@ public class AdminController {
         return new ResponseEntity<>("User logged out please login again", HttpStatus.EXPECTATION_FAILED);
     }
 
-
-
 }

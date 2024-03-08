@@ -117,7 +117,6 @@ public class UserServiceImpl implements IUserService{
 
     @Override
     public ResponseEntity<?> deleteMovie(Long movieId) {
-
        if( movieRepository.findById(movieId).isPresent()) {
            movieRepository.deleteById(movieId);
            return new ResponseEntity<>("Movie deleted successfully",HttpStatus.OK);
@@ -147,8 +146,6 @@ public class UserServiceImpl implements IUserService{
                 .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
                 .toString();
     }
-
-
 
 
 }
